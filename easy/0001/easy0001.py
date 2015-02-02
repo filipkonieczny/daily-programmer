@@ -60,7 +60,7 @@ def get_int(msg):
 
 def save_data(file_name, data):
     '''
-    Save any JSON data into a file.
+    Saves any JSON data into a file.
 
     '''
 
