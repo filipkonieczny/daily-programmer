@@ -75,7 +75,7 @@ def main():
     '''
 
     # 'hello' message
-    print '\nOhai!\n'
+    print '\nOhai!\nThis program asks questions and you better answer them!\n'
 
     # get data
     name = get_string("What's your name?: ")
