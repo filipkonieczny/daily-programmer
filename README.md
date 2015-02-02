@@ -1,4 +1,4 @@
-# /r/DailyProgrammer
+# Daily Programmer
 Code written for [/r/DailyProgrammer](http://www.reddit.com/r/dailyprogrammer/) challenges.
 
 
