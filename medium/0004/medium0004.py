@@ -6,22 +6,21 @@
 # http://www.reddit.com/r/dailyprogrammer/comments/pm6sq/2122012_challenge_4_intermediate/
 
 
-# imports
-
-
 # globals
 operators = {
     '+': lambda a, b: a + b,
-    '-': lambda a, b: a - b
+    '-': lambda a, b: a - b,
+    '*': lambda a, b: a * b,
+    '/': lambda a, b: a / b
 }
 
 
 # functions
 def validate_input(user_input):
     '''
-    Validates user input, checks if it's not empty, if it doesn't
-    contain any *undesirable* characters, if there aren't any
-    operators at the beginning/end or if operators aren't followed
+    Validates user input, checks if it doesn't contain any
+    *undesirable* characters, if there aren't any operators
+    at the beginning/end or if operators aren't followed
     by another operators.
 
     (string) -> bool
@@ -31,10 +30,9 @@ def validate_input(user_input):
 
     '''
 
-    # check if user_input isn't empty
+    # check if it's empty
     if not user_input:
-        print 'Pls, enter something, anything!\n'
-        return False
+        return None
 
     # check if there aren't any invalid characters
     for i in user_input:
@@ -72,12 +70,23 @@ def get_input():
     while True:
         user_input = raw_input('>>> ')
 
-        if validate_input(user_input):
+        validated_input = validate_input(user_input)
+        if validated_input is None:
+            return None
+
+        if validated_input:
             return user_input
 
 
 def strip_user_input(user_input):
     '''
+    Strips user_input into segments of numbers and operators.
+
+    (string) -> [floats, strings]
+
+    >>> stripped_user_input('2+2')
+    [2.0, '+', 2.0]
+
     '''
 
     start = 0
@@ -85,23 +94,59 @@ def strip_user_input(user_input):
 
     for i, char in enumerate(user_input):
         if char in operators:
-            stripped_user_input.append(user_input[start:i])
+            stripped_user_input.append(float(user_input[start:i]))
             stripped_user_input.append(char)
             start = i + 1
-    stripped_user_input.append(user_input[start:])
+    stripped_user_input.append(float(user_input[start:]))
 
-    print stripped_user_input
+    return stripped_user_input
 
+
+def evaluate_operation(stripped_user_input, operator):
+    '''
+    Discovers an operation and evaluates it.
+
+    ([floats, strings], string) -> [floats, strings]
+
+    >>> evaluate_operation([2.0, '+', 2.0], '+')
+    [4.0]
+
+    '''
+
+    if operator in stripped_user_input:
+        current = stripped_user_input.index(operator)
+        current_result = operators[operator](
+            stripped_user_input[current - 1],
+            stripped_user_input[current + 1]
+        )
+        stripped_user_input[current - 1] = current_result
+        stripped_user_input.pop(current)
+        stripped_user_input.pop(current)
     return stripped_user_input
 
 
 def evaluate(user_input):
     '''
+    Evaluates the whole sequence.
+
+    (string) -> float
+
+    >>> evaluate('2+2')
+    4.0
+
     '''
 
     stripped_user_input = strip_user_input(user_input)
 
-    return None
+    while stripped_user_input:
+        stripped_user_input = evaluate_operation(stripped_user_input, '*')
+        stripped_user_input = evaluate_operation(stripped_user_input, '/')
+        stripped_user_input = evaluate_operation(stripped_user_input, '+')
+        stripped_user_input = evaluate_operation(stripped_user_input, '-')
+
+        if len(stripped_user_input) == 1:
+            break
+    return stripped_user_input[0]
 
 
 def main():
@@ -114,8 +159,11 @@ def main():
     print '\nOhai! This is a simple calculator implementation - enjoy!\n'
 
     # main logic
-    user_input = get_input()
-    print evaluate(user_input)
+    while True:
+        user_input = get_input()
+        if user_input is None:
+            break
+        print '  = {}\n'.format(evaluate(user_input))
 
     # 'goodbye' message
     print '\n\nCheers!\n'
